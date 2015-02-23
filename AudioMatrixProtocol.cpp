@@ -1,173 +1,101 @@
 #include <Arduino.h>
+#include <Effectrino.h>
+#include <AudioMatrixProtocol.h>
+#include <AudioMatrixMessage.h>
 
+#include <tools.h>
 
 namespace EFFECTRINO_NAMESPACE {
 
+	AudioMatrixProtocol::AudioMatrixProtocol(Stream & s): rStream(s) {}
+
+	AudioMatrixMessage AudioMatrixProtocol::receiveMessage()
+	{
+		int command = rStream.read();
+
+		// Console << "\r\n\r\nByte received: " << command << ", available " << rStream.available() << " more bytes\r\n";
+
+		// Drop errors
+		if ( ! isCommandByte(command) )
+		{
+			Console << "Not command byte, exiting...\r\n";
+			return NULL;
+		}
+
+		// Create new message
+		// static AudioMatrixMessage * msg = new AudioMatrixMessage();
+		AudioMatrixMessage msg(command);
+
+		// msg->setCommand(command);
+
+		// if ( msg.isOn() )
+		// 	Console << "On command detected" << "\r\n";
+		// else if ( msg.isOff() )
+		// 	Console << "Off command detected" << "\r\n";
+		// else if ( msg.isReset() )
+		// 	Console << "Reset command detected" << "\r\n";
+
+		// Get data length
+		int dataLength = rStream.available();
+
+		// Console << "Reading data bytes..." << "\r\n";
+
+		// "Reset" message
+		if (msg.isReset() && dataLength >= 0)
+		{
+			// Nothing to do
+		}
+		// "On" message
+		else if (msg.isOn() && dataLength >= 2)
+		{
+			msg.setX(rStream.read() & DataMask);
+			msg.setY(rStream.read() & DataMask);
+		}
+		// "Off" message
+		else if (msg.isOff() && dataLength >= 2)
+		{
+			msg.setX(rStream.read() & DataMask);
+			msg.setY(rStream.read() & DataMask);
+		}
+		// Something goes wrong
+		else
+		{
+			return NULL;
+		}
+
+		return msg;
+	}
+
+	int AudioMatrixProtocol::getI2CAddress()
+	{
+		return I2CAddress;
+	}
+
+	void AudioMatrixProtocol::sendOff(int x, int y)
+	{
+		rStream.write(AudioMatrixMessage::OFF_COMMAND);
+		rStream.write(x);
+		rStream.write(y);
+	}
+
+	void AudioMatrixProtocol::sendOn(int x, int y)
+	{
+		rStream.write(AudioMatrixMessage::ON_COMMAND);
+		rStream.write(x);
+		rStream.write(y);
+	}
+
+	void AudioMatrixProtocol::sendReset()
+	{
+		rStream.write(AudioMatrixMessage::RESET_COMMAND);
+	}
+
 	/**
-	  * Abstract message
+	  *	Returns TRUE if it`s command byte
 	  */
-	class AudioMatrixMessage 
+	bool AudioMatrixProtocol::isCommandByte(int data)
 	{
-
-	public:
-
-		operator int() const { return (command != NULL); }
-
-		static const int OffCommand = 0xF0;
-		static const int OnCommand = 0xF1;
-		static const int ResetCommand = 0xFF;
-
-		// AudioMatrixMessage(int); // constructor declaration
-		
-		// AudioMatrixMessage() : command(cmd);
-
-		void setCommand(int cmd) {
-			command = cmd;
-		}
-
-		int getCommand() {
-			return command;
-		}
-
-		int getX() {
-			return x;
-		}
-
-		int getY() {
-			return y;
-		}
-
-		void setX(int value) {
-			x = value;
-		}
-
-		void setY(int value) {
-			y = value;
-		}
-
-		bool isOn() {
-			return (command == OnCommand);
-		}
-
-		bool isOff() {
-			return (command == OffCommand);
-		}
-
-		bool isReset() {
-			return (command == ResetCommand);
-		}
-
-	private:
-		int command;
-		int x = NULL;
-		int y = NULL;
-
-	};
-
-	// struct AudioMatrixMessageOff : AudioMatrixMessage {
-	// 	int x;
-	// 	int y;
-	// }
-
-	// struct AudioMatrixMessageOn : AudioMatrixMessage {
-	// 	int x;
-	// 	int y;
-	// }
-
-	// struct AudioMatrixMessageReset : AudioMatrixMessage {}
-
-	class AudioMatrixProtocol
-	{
-	public:
-
-		AudioMatrixProtocol(Stream & s): rStream(s) {}
-
-		// void setStream(Stream & pStream)
-		// {
-		// 	rStream = pStream;
-		// }
-
-		AudioMatrixMessage * receiveMessage() {
-			int command = rStream.read();
-
-			// Drop errors
-			if ( ! isCommandByte(command) )
-				return NULL;
-
-			// Create new message
-			// static AudioMatrixMessage * msg = new AudioMatrixMessage();
-			static AudioMatrixMessage * msg;
-
-			msg->setCommand(command);
-
-			// Get data length
-			int dataLength = rStream.available();
-
-			// "Reset" message
-			if (msg->isReset() && dataLength >= 0)
-			{
-				// Nothing to do
-			}
-			// "On" message
-			else if (msg->isOn() && dataLength >= 2)
-			{
-				msg->setX(rStream.read() & DataMask);
-				msg->setY(rStream.read() & DataMask);
-			}
-			// "Off" message
-			else if (msg->isOff() && dataLength >= 2)
-			{
-				msg->setX(rStream.read() & DataMask);
-				msg->setY(rStream.read() & DataMask);
-			}
-			// Something goes wrong
-			else
-			{
-				return NULL;
-			}
-
-			return msg;
-		}
-
-		int getI2CAddress()
-		{
-			return I2CAddress;
-		}
-
-		void sendOff(int x, int y)
-		{
-			rStream.write(AudioMatrixMessage::OffCommand);
-			rStream.write(x);
-			rStream.write(y);
-		}
-
-		void sendOn(int x, int y)
-		{
-			rStream.write(AudioMatrixMessage::OnCommand);
-			rStream.write(x);
-			rStream.write(y);
-		}
-
-		void sendReset()
-		{
-			rStream.write(AudioMatrixMessage::ResetCommand);
-		}
-
-	private:
-
-		const int I2CAddress = 4;
-		const int DataMask = 0x0F;
-
-		Stream & rStream;
-
-		/**
-		  *	Returns TRUE if it`s command byte
-		  */
-		bool isCommandByte(int data)
-		{
-			return ( data >= 0xF0 );
-		}
-
-	};
+		return ( data >= 0xF0 );
+	}
 
 }

@@ -1,107 +1,125 @@
-// #include <Arduino.h>
+#include <Arduino.h>
+#include <Effectrino.h>
+
+#include <EffectsStack.h>
+#include <PatchEffect.h>
+#include <EffectsStackItem.h>
+
+#include <tools.h>
+
+USING_NAMESPASE_EFFECTRINO
 
 namespace EFFECTRINO_NAMESPACE {
 
 
-	class EffectsStackItem {
+		// TODO
+		void EffectsStack::on(PatchEffect *effectPtr, byte velocity)
+		{
+			EffectsStackItem * stackItemPtr = find(effectPtr);
 
-	public:
-		EffectsStackItem(int note) : MIDINote(note) {}
+			// Does effect is in stack?
+			if ( !stackItemPtr )
+			{
+				stackItemPtr = new EffectsStackItem(effectPtr->getID());	// No, create new item
+				push(stackItemPtr);																				// Push it to stack
+			}
 
-		void enable() {
-			MIDINote = true;
+			// TODO Add effect in the stackItem
+
+			// TODO Get current preset
+
+			// Does effect is enabled?
+			if ( stackItemPtr->isEnabled() )
+			{
+				// effectPtr
+
+			}
+			else	// No, it`s switched off
+			{
+				// Switch it on
+				stackItemPtr->enable();
+
+				// Configure matrix
+
+			}
+
+
+
 		}
-
-		void disable() {
-			MIDINote = false;
-		}
-
-	private:
-		int MIDINote;
-		bool enabled = true;
-
-	};
-
-
-
-	class EffectsStack {
-
-	public:
 
 		// TODO
-		void noteOn(byte pitch, byte velocity)
+		void EffectsStack::off(PatchEffect *effectPtr)
 		{
+			EffectsStackItem * stackItemPtr = find(effectPtr);
 
-		}
+			// Does effect is in stack?
+			if ( !stackItemPtr )
+			{
+				Console << "fake noteOff event"; 
+				return;	
+			}
 
-		// TODO
-		void noteOff(byte pitch)
-		{
+			if ( ! stackItemPtr->isEnabled() )
+			{
+				Console << "stack effect is already disabled; nothing to do"; 
+				return;
+			}
 
+			// Mark effect as switched off
+			stackItemPtr->disable();
 		}
 
 		// TODO 
-		void find(byte pitch)
+		EffectsStackItem * EffectsStack::find(PatchEffect *effectPtr)
 		{
+			int effectID = effectPtr->getID();
 
-			for (int i = 0; i < stackSize; ++i)
+			for (int i = 0; i < ::EFFECTS_STACK_SIZE; ++i)
 	  	{
-			    // if( stack[i]. )
+			    if( stackPtr[i]->getID() == effectID )
+			    	return stackPtr[i];
 			}
+
+			return NULL;
 		}
 		
 		// Clear effect stack
-		void clear()
+		void EffectsStack::clear()
 		{
-		  for (int i = 0; i < stackSize; ++i)
+		  for (int i = 0; i < ::EFFECTS_STACK_SIZE; ++i)
 		  {
-	  		stack[i] = NULL;
+		  	// TODO Destroy all nested objects
+	  		stackPtr[i] = NULL;
 		  }
 		}
 
-	private:
 
-		static const int stackSize = 16;
-
-		const int AUDIO_MATRIX_PINS_PER_EFFECT = 2;
-		const int AUDIO_MATRIX_MAIN_PIN_INDEX = 0;
-		const int AUDIO_MATRIX_AUX_PIN_INDEX = 1;
-
-		// enum audioMatrixEffectPins
-		// {
-		// 	Main,
-		// 	Aux
-		// };
-
-		// array[16] of MIDI notes (mapped later to effects)
-		int stack[stackSize];
-
-
-		/**
-			* Returns
-			*/	
-		int calculateEffectPin(int effectIndex, int pinIndex)
+		void EffectsStack::push(EffectsStackItem * itemPtr)
 		{
-			return effectIndex * AUDIO_MATRIX_PINS_PER_EFFECT + pinIndex;
+			bool found = false; 
+
+			// Store effect at first NULL pointer
+		  for (char i = 0; i < ::EFFECTS_STACK_SIZE; ++i)
+		  {
+	  		if ( stackPtr[i] == NULL )
+	  		{
+	  			found = true;
+	  			stackPtr[i] = itemPtr;
+
+	  			// TODO Push slot to matrix
+
+	  			::Console << "Effect with ID " << itemPtr->getID() << " pushed to stack on position " << i;
+	  			break;
+	  		}
+		  }
+
+		  if ( !found )
+		  {
+	  			::Console << "Error: effect stack is full!";
+		  }
 		}
 
-		/**
-			*
-			*/	
-		int calculateEffectMainPin(const int effectIndex)
-		{
-			return calculateEffectPin(effectIndex, EFFECT_MAIN_PIN_INDEX);
-		}
 
-		/**
-			*
-			*/	
-		int calculateEffectAuxPin(int effectIndex)
-		{
-			return calculateEffectPin(effectIndex, EFFECT_AUX_PIN_INDEX);
-		}
-
-	};
 
 } // EndOf namespace 
 
