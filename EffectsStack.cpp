@@ -5,7 +5,7 @@
 #include <PatchEffect.h>
 #include <EffectsStackItem.h>
 
-#include <tools.h>
+#include <duino-tools.h>
 
 USING_NAMESPASE_EFFECTRINO
 
@@ -55,13 +55,13 @@ namespace EFFECTRINO_NAMESPACE {
 			// Does effect is in stack?
 			if ( !stackItemPtr )
 			{
-				Console << "fake noteOff event"; 
+				Debug << "fake noteOff event"; 
 				return;	
 			}
 
 			if ( ! stackItemPtr->isEnabled() )
 			{
-				Console << "stack effect is already disabled; nothing to do"; 
+				Debug << "stack effect is already disabled; nothing to do"; 
 				return;
 			}
 
@@ -108,14 +108,14 @@ namespace EFFECTRINO_NAMESPACE {
 
 	  			// TODO Push slot to matrix
 
-	  			::Console << "Effect with ID " << itemPtr->getID() << " pushed to stack on position " << i;
+	  			::Debug << "Effect with ID " << itemPtr->getID() << " pushed to stack on position " << i;
 	  			break;
 	  		}
 		  }
 
 		  if ( !found )
 		  {
-	  			::Console << "Error: effect stack is full!";
+	  			::Debug << "Error: effect stack is full!";
 		  }
 		}
 

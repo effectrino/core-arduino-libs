@@ -3,7 +3,7 @@
 #include <AudioMatrixProtocol.h>
 #include <AudioMatrixMessage.h>
 
-#include <tools.h>
+#include <duino-tools.h>
 
 namespace EFFECTRINO_NAMESPACE {
 
@@ -18,7 +18,7 @@ namespace EFFECTRINO_NAMESPACE {
 		// Drop errors
 		if ( ! isCommandByte(command) )
 		{
-			Console << "Not command byte, exiting...\r\n";
+			Debug << "Not command byte, exiting...\r\n";
 			return NULL;
 		}
 

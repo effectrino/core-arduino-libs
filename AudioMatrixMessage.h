@@ -37,8 +37,8 @@ namespace EFFECTRINO_NAMESPACE {
 
 	private:
 		int command;
-		int x = NULL;
-		int y = NULL;
+		int x;
+		int y;
 
 	};
 

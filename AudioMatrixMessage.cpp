@@ -2,7 +2,7 @@
 
 #include <AudioMatrixMessage.h>
 
-#include <tools.h>
+#include <duino-tools.h>
 
 namespace EFFECTRINO_NAMESPACE {
 
@@ -12,7 +12,7 @@ namespace EFFECTRINO_NAMESPACE {
 
 	AudioMatrixMessage::operator int()
 	{ 
-		return (this->command != NULL);
+		return (this->command > 0x00);
 	}
 
 	AudioMatrixMessage::AudioMatrixMessage(int cmd) : command(cmd) {}
@@ -43,17 +43,17 @@ namespace EFFECTRINO_NAMESPACE {
 	}
 
 	const bool AudioMatrixMessage::isOn() {
-		// Console << "Is " << this->getCommand() << " == ON_COMMAND (" << ON_COMMAND << ")?" << "\r\n";
+		// Debug << "Is " << this->getCommand() << " == ON_COMMAND (" << ON_COMMAND << ")?" << "\r\n";
 		return (this->getCommand() == ON_COMMAND);
 	}
 
 	const bool AudioMatrixMessage::isOff() {
-		// Console << "Is " << this->getCommand() << " == OFF_COMMAND (" << OFF_COMMAND << ")?" << "\r\n";
+		// Debug << "Is " << this->getCommand() << " == OFF_COMMAND (" << OFF_COMMAND << ")?" << "\r\n";
 		return (this->getCommand() == OFF_COMMAND);
 	}
 
 	const bool AudioMatrixMessage::isReset() {
-		// Console << "Is " << this->getCommand() << " == RESET_COMMAND (" << RESET_COMMAND << ")?" << "\r\n";
+		// Debug << "Is " << this->getCommand() << " == RESET_COMMAND (" << RESET_COMMAND << ")?" << "\r\n";
 		return (this->getCommand() == RESET_COMMAND);
 	}
 
