@@ -5,97 +5,93 @@
 
 #include <duino-tools.h>
 
-namespace EFFECTRINO_NAMESPACE {
+USING_NAMESPASE_EFFECTRINO
 
-	AudioMatrixProtocol::AudioMatrixProtocol(Stream & s): rStream(s) {}
+AudioMatrixProtocol::AudioMatrixProtocol(Stream & s): rStream(s) {}
 
-	AudioMatrixMessage AudioMatrixProtocol::receiveMessage()
+AudioMatrixMessage* AudioMatrixProtocol::receiveMessage()
+{
+	int command = rStream.read();
+
+	// Console << "\r\n\r\nByte received: " << command << ", available " << rStream.available() << " more bytes\r\n";
+
+	// Drop errors
+	if ( ! isCommandByte(command) )
 	{
-		int command = rStream.read();
-
-		// Console << "\r\n\r\nByte received: " << command << ", available " << rStream.available() << " more bytes\r\n";
-
-		// Drop errors
-		if ( ! isCommandByte(command) )
-		{
-			Debug << "Not command byte, exiting...\r\n";
-			return NULL;
-		}
-
-		// Create new message
-		// static AudioMatrixMessage * msg = new AudioMatrixMessage();
-		AudioMatrixMessage msg(command);
-
-		// msg->setCommand(command);
-
-		// if ( msg.isOn() )
-		// 	Console << "On command detected" << "\r\n";
-		// else if ( msg.isOff() )
-		// 	Console << "Off command detected" << "\r\n";
-		// else if ( msg.isReset() )
-		// 	Console << "Reset command detected" << "\r\n";
-
-		// Get data length
-		int dataLength = rStream.available();
-
-		// Console << "Reading data bytes..." << "\r\n";
-
-		// "Reset" message
-		if (msg.isReset() && dataLength >= 0)
-		{
-			// Nothing to do
-		}
-		// "On" message
-		else if (msg.isOn() && dataLength >= 2)
-		{
-			msg.setX(rStream.read() & DataMask);
-			msg.setY(rStream.read() & DataMask);
-		}
-		// "Off" message
-		else if (msg.isOff() && dataLength >= 2)
-		{
-			msg.setX(rStream.read() & DataMask);
-			msg.setY(rStream.read() & DataMask);
-		}
-		// Something goes wrong
-		else
-		{
-			return NULL;
-		}
-
-		return msg;
+		Debug << F("Not command byte, exiting...") << CRLF;
+		return NULL;
 	}
 
-	int AudioMatrixProtocol::getI2CAddress()
+	// Create new message
+	AudioMatrixMessage * msg = new AudioMatrixMessage(command);
+	// AudioMatrixMessage msg(command);
+
+	// if ( msg->isOn() )
+	// 	Console << "On command detected" << "\r\n";
+	// else if ( msg->isOff() )
+	// 	Console << "Off command detected" << "\r\n";
+	// else if ( msg->isReset() )
+	// 	Console << "Reset command detected" << "\r\n";
+
+	// Get data length
+	int dataLength = rStream.available();
+
+	// Console << "Reading data bytes..." << "\r\n";
+
+	// "Reset" message
+	if (msg->isReset() && dataLength >= 0)
 	{
-		return I2CAddress;
+		// Nothing to do
+	}
+	// "On" message
+	else if (msg->isOn() && dataLength >= 2)
+	{
+		msg->setX(rStream.read() & DATA_MASK);
+		msg->setY(rStream.read() & DATA_MASK);
+	}
+	// "Off" message
+	else if (msg->isOff() && dataLength >= 2)
+	{
+		msg->setX(rStream.read() & DATA_MASK);
+		msg->setY(rStream.read() & DATA_MASK);
+	}
+	// Something goes wrong
+	else
+	{
+		return (AudioMatrixMessage*)NULL;
 	}
 
-	void AudioMatrixProtocol::sendOff(int x, int y)
-	{
-		rStream.write(AudioMatrixMessage::OFF_COMMAND);
-		rStream.write(x);
-		rStream.write(y);
-	}
+	return msg;
+}
 
-	void AudioMatrixProtocol::sendOn(int x, int y)
-	{
-		rStream.write(AudioMatrixMessage::ON_COMMAND);
-		rStream.write(x);
-		rStream.write(y);
-	}
+int AudioMatrixProtocol::getI2CAddress()
+{
+	return I2C_ADDRESS;
+}
 
-	void AudioMatrixProtocol::sendReset()
-	{
-		rStream.write(AudioMatrixMessage::RESET_COMMAND);
-	}
+void AudioMatrixProtocol::sendOff(int x, int y)
+{
+	rStream.write(AudioMatrixMessage::OFF_COMMAND);
+	rStream.write(x);
+	rStream.write(y);
+}
 
-	/**
-	  *	Returns TRUE if it`s command byte
-	  */
-	bool AudioMatrixProtocol::isCommandByte(int data)
-	{
-		return ( data >= 0xF0 );
-	}
+void AudioMatrixProtocol::sendOn(int x, int y)
+{
+	rStream.write(AudioMatrixMessage::ON_COMMAND);
+	rStream.write(x);
+	rStream.write(y);
+}
 
+void AudioMatrixProtocol::sendReset()
+{
+	rStream.write(AudioMatrixMessage::RESET_COMMAND);
+}
+
+/**
+  *	Returns TRUE if it`s command byte
+  */
+bool AudioMatrixProtocol::isCommandByte(int data)
+{
+	return ( data > DATA_MASK );
 }

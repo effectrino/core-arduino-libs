@@ -13,9 +13,6 @@ namespace EFFECTRINO_NAMESPACE {
 
 	public:
 
-		// array[16] of effects
-		EffectsStackItem * stackPtr[EFFECTS_STACK_SIZE];
-
 		// TODO 
 		EffectsStackItem * find(PatchEffect *effectPtr);
 
@@ -29,6 +26,9 @@ namespace EFFECTRINO_NAMESPACE {
 		void clear();
 
 	private:
+
+		// array[16] of effects
+		// EffectsStackItem * stackPtr[EFFECTS_STACK_SIZE];
 
 		// Add effect to stack
 		void push(EffectsStackItem * itemPtr);

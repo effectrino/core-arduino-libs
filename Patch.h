@@ -14,16 +14,16 @@ namespace EFFECTRINO_NAMESPACE {
 	public:
 
 		// TODO Продумать механизм хранения эффектов в патче (будут хранить копию пресета внутри патча)
-		PatchEffect * effects[EFFECTS_PER_PATCH];
+		// PatchEffect * effects[EFFECTS_PER_PATCH];
 
 		// Array of MIDI notes
-		char stack[EFFECTS_STACK_SIZE];
+		// char stack[EFFECTS_STACK_SIZE];
 
 		// TODO 
-		PatchEffect * getEffectByMIDINote(char note);
+		// PatchEffect * getEffectByMIDINote(char note);
 
 		// TODO Get array of stack MIDI notes
-		char * getStackMIDINotes();
+		// char * getStackMIDINotes();
 	
 	};
 

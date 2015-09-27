@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <Effectrino.h>
 
-namespace EFFECTRINO_NAMESPACE {
+BEGIN_EFFECTRINO_NAMESPACE
 
 	/**
 	  * Abstract message
@@ -18,9 +18,10 @@ namespace EFFECTRINO_NAMESPACE {
 
 		AudioMatrixMessage(int command);
 
-		static const int OFF_COMMAND = 0xF0;
-		static const int ON_COMMAND = 0xF1;
-		static const int RESET_COMMAND = 0xFF;
+		static const int DATA_MASK;
+		static const int OFF_COMMAND;
+		static const int ON_COMMAND;
+		static const int RESET_COMMAND;
 
 		// void setCommand(int cmd);
 
@@ -42,6 +43,6 @@ namespace EFFECTRINO_NAMESPACE {
 
 	};
 
-}
+END_EFFECTRINO_NAMESPACE
 
 #endif // AudioMatrixMessage_h_

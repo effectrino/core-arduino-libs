@@ -25,17 +25,17 @@ namespace EFFECTRINO_NAMESPACE {
 		// }
 
 		// TODO Get array of stack MIDI notes
-	char * Patch::getStackMIDINotes()
-	{
-		return stack;
-	}
+	// char * Patch::getStackMIDINotes()
+	// {
+	// 	return stack;
+	// }
 
-	// };
+	// // };
 
-	PatchEffect * Patch::getEffectByMIDINote(char note)
-	{
-			return effects[note];
-	}
+	// PatchEffect * Patch::getEffectByMIDINote(char note)
+	// {
+	// 		return effects[note];
+	// }
 
 }
 

@@ -6,16 +6,14 @@
 #include <AudioMatrixMessage.h>
 
 
+BEGIN_EFFECTRINO_NAMESPACE
 
-namespace EFFECTRINO_NAMESPACE {
-
-	class AudioMatrixProtocol
-	{
+class AudioMatrixProtocol {
 	public:
 
 		AudioMatrixProtocol(Stream & s);
 
-		AudioMatrixMessage receiveMessage();
+		AudioMatrixMessage* receiveMessage();
 
 		int getI2CAddress();
 
@@ -25,8 +23,8 @@ namespace EFFECTRINO_NAMESPACE {
 
 	private:
 
-		const int I2CAddress = 4;
-		const int DataMask = 0x0F;
+		const int I2C_ADDRESS = 4;
+		const int DATA_MASK = AudioMatrixMessage::DATA_MASK;
 
 		Stream & rStream;
 
@@ -35,9 +33,8 @@ namespace EFFECTRINO_NAMESPACE {
 		  */
 		bool isCommandByte(int data);
 
-	};
+};
 
-}
-
+END_EFFECTRINO_NAMESPACE
 
 #endif // AudioMatrixProtocol_h_
